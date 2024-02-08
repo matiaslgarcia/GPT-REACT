@@ -3,7 +3,7 @@ import type { OrthographyResponse } from "../../interfaces/orthography.interface
 export const orthographyUseCase = async (prompt: string) => {
     try {
 
-        const resp = await fetch(`${import.meta.env.VITE_GPT_API}/orthography-check`, {
+        const resp = await fetch(`${ import.meta.env.VITE_GPT_API }/orthography-check`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
