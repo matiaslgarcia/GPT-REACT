@@ -1,9 +1,15 @@
 import { useState } from "react";
-import { GPTMessage, MyMessage, TextMessageBox, TypingLoader } from "../../components"
+import { GPTMessage, GPTOrthographyMessage, MyMessage, TextMessageBox, TypingLoader } from "../../components"
+import { orthographyUseCase } from "../../../core/use-cases";
 
 interface Message {
   text: string;
   isGPT: boolean;
+  info?: {
+    userScore: number
+    errors: string[]
+    message: string
+  }
 }
 
 export const OrthographyPage = () => {
@@ -15,22 +21,41 @@ export const OrthographyPage = () => {
     setIsLoading(true)
     setMessage((prev) => [...prev, { text: text, isGPT: false }])
 
-    //TODO: UseCase
-    setIsLoading(false)
+    const data = await orthographyUseCase(text)
 
-    //Todo: añadir mensaje
+    if (!data.ok) {
+      setMessage((prev) => [...prev, { text: 'No se pudo realizar la correccion', isGPT: true }])
+    } else {
+      setMessage((prev) => [...prev,
+      {
+        text: data.message,
+        isGPT: true,
+        info: {
+          errors: data.errors,
+          message: data.message,
+          userScore: data.userScore
+        }
+      }
+      ])
+    }
+    setIsLoading(false)
   }
   return (
     <div className='chat-container'>
       <div className="chat-messages">
         <div className="grid grid-cols-12 gap-y-2">
 
-          <GPTMessage text="Hola, soy tu asistente profesional" />
+          <GPTMessage text="Hola, soy tu asistente profesional, escribe lo que quieras para poder corregirte" />
           {
             messages.map((msj, index) => (
               msj.isGPT
                 ? (
-                  <GPTMessage key={index} text="Esto es de OpenAI" />
+                  <GPTOrthographyMessage
+                    key={index}
+                    errors={msj.info!.errors}
+                    message={msj.info!.message}
+                    userScore={msj.info!.userScore}
+                  />
                 )
                 :
                 <MyMessage key={index} text={msj.text} />
@@ -52,17 +77,6 @@ export const OrthographyPage = () => {
         placeholder="Escribe algo"
         disableCorrections
       />
-      {/* <TextMessageBoxFile
-        onSendMessage={handlePost}
-        placeholder="Escribe algo"
-
-      /> */}
-      {/* <TextMessageBoxSelect
-        onSendMessage={handlePost}
-        placeholder="Escribe algo"
-        disableCorrections
-        options={[{id:'1', text:'hola'}, {id:"2", text:'mundo'}]}
-      /> */}
     </div>
   )
 }

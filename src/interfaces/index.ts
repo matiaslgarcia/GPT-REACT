@@ -1,0 +1,5 @@
+export * from './orthography.interface'
+export * from './prosConsDiscusser.interface'
+export * from './translate.interface'
+export * from './audioToText.interface'
+export * from './assistants.interface'

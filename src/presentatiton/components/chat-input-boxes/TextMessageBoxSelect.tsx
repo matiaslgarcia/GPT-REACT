@@ -20,12 +20,11 @@ export const TextMessageBoxSelect = ({ onSendMessage, placeholder, disableCorrec
   const [message, setMessage] = useState('');
   const [selectedOption, setSelectedOption] = useState<string>('');
 
-
-
   const handleSendMessage = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if ( message.trim().length === 0 ) return;
+    if( selectedOption === '') return
 
     onSendMessage( message, selectedOption );
     setMessage('');
